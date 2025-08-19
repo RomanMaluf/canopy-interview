@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 require 'httparty'
+
 module Github
   class Client
     # CustomError class It is thrown when an error occurs with the API
@@ -12,7 +15,6 @@ module Github
         @response_body = response_body
       end
     end
-
 
     # this class is responsible for making requests to the Github API
     # It accepts a personal access token and stores it as an instance variable.
@@ -56,6 +58,23 @@ module Github
       end
 
       results
+    end
+
+    # TODO: not yet implemented
+    def query_graphql(query, variables = {})
+      response = HTTParty.post(
+        @repo_url,
+        headers: headers.merge('Content-Type' => 'application/json'),
+        body: { query: query, variables: variables }.to_json
+      )
+
+      puts "BODY #{{ query: query, variables: variables }.to_json}"
+      unless response.success?
+        raise Error.new("GraphQL API error: #{response.code}", status: response.code, url: @repo_url,
+                                                               response_body: response.body)
+      end
+
+      JSON.parse(response.body)
     end
 
     private

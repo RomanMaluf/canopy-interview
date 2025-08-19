@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require_relative '../process'
+require_relative '../github/processor'
 
 RSpec.describe Github::Processor do
   let(:client) { Github::Client.new('fake_token', 'https://api.github.com/repos/paper-trail-gem/paper_trail') }

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require_relative '../client'
+require_relative '../github/client'
 require 'webmock/rspec'
 
 RSpec.describe Github::Client do
