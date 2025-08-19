@@ -1,4 +1,6 @@
-require_relative './client.rb'
+# frozen_string_literal: true
+
+require_relative './client'
 require 'json'
 
 module Github
@@ -19,26 +21,36 @@ module Github
       # It returns the response from the Github API.
 
       state = open ? 'open' : 'closed'
-      # Return a list of issues from the response, with each line showing the issue's title, whether it is open or closed,
+      # Return a list of issues from the response, with each line showing the issue's title,
+      # whether it is open or closed,
       # and the date the issue was closed if it is closed, or the date the issue was created if it is open.
       # the issues are sorted by the date they were closed or created, from newest to oldest.
-      
-      response = @client.get("/issues?state=#{state}")
-      issues = JSON.parse(response.body)
-      sorted_issues = issues.sort_by do |issue|
-        if state == 'closed'
-          issue['closed_at']
-        else
-          issue['created_at']
+
+      # response = @client.get("/issues?state=#{state}")
+      path = "/issues?state=#{state}"
+
+      begin
+        all_items = @client.fetch_all(path)
+        issues = all_items.reject { |item| item.key?('pull_request') }
+        # # issues = JSON.parse(response.body)
+        sorted_issues = issues.sort_by do |issue|
+          if state == 'closed'
+            issue['closed_at']
+          else
+            issue['created_at']
+          end
+        end.reverse
+
+        sorted_issues.each do |issue|
+          if issue['state'] == 'closed'
+            puts "#{issue['title']} - #{issue['state']} - Closed at: #{issue['closed_at']}"
+          else
+            puts "#{issue['title']} - #{issue['state']} - Created at: #{issue['created_at']}"
+          end
         end
-      end.reverse
-      
-      sorted_issues.each do |issue|
-        if issue['state'] == 'closed'
-          puts "#{issue['title']} - #{issue['state']} - Closed at: #{issue['closed_at']}"
-        else
-          puts "#{issue['title']} - #{issue['state']} - Created at: #{issue['created_at']}"
-        end
+      rescue Github::Client::Error => e
+        warn "GitHub API Error (#{e.status}) on #{e.url}"
+        warn "Response body: #{e.response_body}"
       end
     end
   end
