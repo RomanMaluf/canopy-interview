@@ -1,5 +1,4 @@
 require 'httparty'
-require 'debug'
 module Github
   class Client
     # CustomError class It is thrown when an error occurs with the API
@@ -28,7 +27,6 @@ module Github
 
     def get(path_or_url)
       url = path_or_url.start_with?('http') ? path_or_url : full_url_for(path_or_url)
-      puts "GET #{url}"
       HTTParty.get(url, headers: headers)
     end
 
