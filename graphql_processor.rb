@@ -10,25 +10,19 @@ module Github
       @org = org
     end
 
-    def get_project(number)
+    def get_project_by_number(number)
       query = <<~GRAPHQL
         query($org: String!, $number: Int!){
           organization(login: $org) {
             projectV2(number: $number) {
               id
               title
-              #
             }
           }
         }
       GRAPHQL
 
-      result = @client.query_graphql(query, { org: @org, number: number })
-      puts '###########'
-      puts result
-      puts '###########'
-      edges = result.dig('data', 'viewer', 'organization', 'projectsV2', 'edges') || []
-      edges.map { |e| e['node'].slice('number', 'title') }
+      @client.query_graphql(query, { org: @org, number: number })
     end
 
     def get_project_issues(project_number)
@@ -84,6 +78,8 @@ module Github
     end
 
     def print_project_issues(project_number)
+      project = get_project_by_number(project_number)
+      puts "Project Title: #{project.dig('data', 'organization', 'projectV2', 'title')}"
       get_project_issues(project_number).each do |item|
         title = item.dig('content', 'title')
         number = item.dig('content', 'number')
