@@ -68,7 +68,6 @@ module Github
         body: { query: query, variables: variables }.to_json
       )
 
-      puts "BODY #{{ query: query, variables: variables }.to_json}"
       unless response.success?
         raise Error.new("GraphQL API error: #{response.code}", status: response.code, url: @repo_url,
                                                                response_body: response.body)
