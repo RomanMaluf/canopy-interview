@@ -60,7 +60,6 @@ module Github
       results
     end
 
-    # TODO: not yet implemented
     def query_graphql(query, variables = {})
       response = HTTParty.post(
         @repo_url,
